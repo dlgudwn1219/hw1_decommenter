@@ -10,6 +10,7 @@ functionality, such as processing or transforming the input data.
 In this specific task, the goal is to implement logic that removes 
 C-style comments from the input. */
 
+//Hello Github!!
 int main(void)
 {
   // ich: int type variable to store character input from getchar() (abbreviation of int character)
