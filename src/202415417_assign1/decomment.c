@@ -1,24 +1,37 @@
-/*
-Name: 이형주(Lee HyungJu)
-# of Assignment: 1
-Name of file: decomment.c
-*/
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+
+/* This is skeleton code for reading characters from 
+standard input (e.g., a file or console input) one by one until 
+the end of the file (EOF) is reached. It keeps track of the current 
+line number and is designed to be extended with additional 
+functionality, such as processing or transforming the input data. 
+In this specific task, the goal is to implement logic that removes 
+C-style comments from the input. */
 
 // Code: Inside code
 // Poss_comm: Possible state to become a comment (i.e. starts with '/')
 // Single_comm, Multi_comm: Single line comment, Multi line comment (i.e. inside //, /*)
 // In_string, In char: Inside String or char (i.e. inside "", '')
 // END: END of file
+// state: Current state of code
 enum DFAState {Code, Poss_comm, Single_comm, Multi_comm, In_string, In_char, END};
+enum DFAState state = Code;
+
+//functions for each states
+void func_Code(char ch);
+void func_Poss_comm(char ch, int line_cur, int *line_com);
+void func_Single_comm(char ch);
+void func_Multi_comm(char ch, char ch_before);
+void func_In_string(char ch);
+void func_In_char(char ch);
+int func_END(int line_cur);
 
 /* 
-Input: Input.c file
+Input: 
 Output: Replace Input Comments with ' ' (i.e. Decommenting), # of lines preserved
-Error: Prints error if Input.c file has unterminated comment
-Return: EXIT_SUCCESS if terminated succesfully, EXIT_FAILURE if un terminated comment
+Error: If Input.c file has unterminated comment
 */
 int main(void)
 {
@@ -26,15 +39,13 @@ int main(void)
   int ich;
   // line_cur & line_com: current line number and comment line number (abbreviation of current line and comment line)
   int line_cur, line_com;
-  // ch: character that comes from casting (char) on ich (abbreviation of character)
-  // ch_before: character just before ch
-  char ch;
-  char ch_before;
 
   line_cur = 1;
   line_com = -1;
 
-  enum DFAState state = Code;
+  // ch: character that comes from casting (char) on ich (abbreviation of character)
+  // ch_before: character just before ch
+  char ch, ch_before;
 
   // This while loop reads all characters from standard input one by one
   while (1) {
@@ -43,66 +54,30 @@ int main(void)
     ich = getchar();
 
 	// prints error if comment is unterminated
-    if (ich == EOF)	{
-		if (state == Single_comm || state == Multi_comm){
-			fprintf(stderr, "Error: line %d: unterminated comment\n", line_com);
-			return (EXIT_FAILURE);
-		}
-		else
-			return (EXIT_SUCCESS);
-	}
+    if (ich == EOF)	return func_END(line_com);
 
     ch = (char)ich;
     
 	switch (state){
 		case Code:
-			if (ch != '/') fprintf(stdout,"%c", ch);
-
-			if (ch == '/') state = Poss_comm;
-			if (ch == '\"') state = In_string;
-			if (ch == '\'') state = In_char;
-
+			func_Code(ch);
 			break;
-		//Possible state to become a comment
 		case Poss_comm:
-			if (ch == '/'){
-				line_com = line_cur;
-				fprintf(stdout, "%c", ' ');
-				state = Single_comm;
-			}
-			else if (ch == '*'){
-				line_com = line_cur;
-				fprintf(stdout, "%c", ' ');
-				state = Multi_comm;
-			}
-			else {
-				fprintf(stdout, "%c", '/');
-				fprintf(stdout, "%c", ch);
-				state = Code;
-			}
+			func_Poss_comm(ch, line_cur, &line_com);
 			break;
-		//Inside Singleline comment, doesn't print anything until get out of comment.
 		case Single_comm:
-			if (ch == '\n'){
-				fprintf(stdout, "%c", '\n');
-				state = Code;
-			}
+			func_Single_comm(ch);
 			break;
-		//Inside Multiline comment, only prints '\n'for line preserving.
 		case Multi_comm:
-			if (ch == '\n') fprintf(stdout, "%c", '\n');
-			if (ch_before == '*' && ch == '/') state = Code;
-
+			func_Multi_comm(ch, ch_before);
 			break;
 		case In_string:
-			fprintf(stdout, "%c", ch);
-			if (ch == '\"') state = Code;
+			func_In_string(ch);
 			break;
 		case In_char:
-			fprintf(stdout, "%c", ch);
-			if (ch == '\'') state = Code;
+			func_In_char(ch);
 			break;
-		//Unreachable state: ich == EOF already implemented before switch-case.
+		//END is already implemented above (if (ich == EOF))
 		case END:
 			break;
 		default:
@@ -118,4 +93,76 @@ int main(void)
   }
   
   return(EXIT_SUCCESS);
+}
+
+// state = Code: print ch, change state
+void func_Code(char ch)
+{
+  	if (ch != '/') fprintf(stdout,"%c", ch);
+
+	if (ch == '/') state = Poss_comm;
+	if (ch == '\"') state = In_string;
+	if (ch == '\'') state = In_char;
+}
+
+// state = Poss_comm: change state to (Single_comm or Multi_comm or Code)
+// update line_com if state becomes comment
+void func_Poss_comm(char ch, int line_cur, int *line_com)
+{
+	if (ch == '/'){
+		*line_com = line_cur;
+		fprintf(stdout, "%c", ' ');
+		state = Single_comm;
+	}
+	else if (ch == '*'){
+		*line_com = line_cur;
+		fprintf(stdout, "%c", ' ');
+		state = Multi_comm;
+	}
+	else {
+		fprintf(stdout, "%c", '/');
+		fprintf(stdout, "%c", ch);
+		state = Code;
+	}
+}
+
+// state = Single_comm: change state when out of comment
+void func_Single_comm(char ch)
+{			
+	if (ch == '\n'){
+		fprintf(stdout, "%c", '\n');
+		state = Code;
+	}
+}
+
+// state = Multi_comm: preserve line num, change state when out of comment
+void func_Multi_comm(char ch, char ch_before)
+{
+	if (ch == '\n') fprintf(stdout, "%c", '\n');
+	if (ch_before == '*' && ch == '/') state = Code;
+}
+
+// state = In_string: print char until out of string
+void func_In_string(char ch)
+{	
+	fprintf(stdout, "%c", ch);
+	if (ch == '\"') state = Code;
+}
+
+// state = In_char: print char until out of character
+void func_In_char(char ch)
+{			
+	fprintf(stdout, "%c", ch);
+	if (ch == '\'') state = Code;
+}
+
+// state = END: print error if unterminated comment, return
+int func_END(int line_com)
+{
+	if (state == Single_comm || state == Multi_comm){
+		fprintf(stderr, "Error: line %d: unterminated comment\n", line_com);
+		return (EXIT_FAILURE);
+	}
+	else
+		return (EXIT_SUCCESS);
 }
