@@ -4,6 +4,11 @@
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 0 "<command-line>" 2
 # 1 "decomment.c"
+
+
+
+
+
 # 1 "/usr/include/stdio.h" 1 3 4
 # 28 "/usr/include/stdio.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -539,7 +544,7 @@ extern int __uflow (FILE *);
 extern int __overflow (FILE *, int);
 # 983 "/usr/include/stdio.h" 3 4
 
-# 2 "decomment.c" 2
+# 7 "decomment.c" 2
 # 1 "/usr/include/assert.h" 1 3 4
 # 66 "/usr/include/assert.h" 3 4
 
@@ -562,7 +567,7 @@ extern void __assert (const char *__assertion, const char *__file, int __line)
 
 
 
-# 3 "decomment.c" 2
+# 8 "decomment.c" 2
 # 1 "/usr/include/stdlib.h" 1 3 4
 # 26 "/usr/include/stdlib.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -754,10 +759,10 @@ extern size_t wcstombs (char *__restrict __s,
 # 1156 "/usr/include/stdlib.h" 2 3 4
 # 1167 "/usr/include/stdlib.h" 3 4
 
-# 4 "decomment.c" 2
-# 19 "decomment.c"
+# 9 "decomment.c" 2
+# 24 "decomment.c"
 
-# 19 "decomment.c"
+# 24 "decomment.c"
 enum DFAState {Code, Poss_comm, Single_comm, Multi_comm, In_string, In_char, END};
 enum DFAState state = Code;
 
@@ -797,9 +802,9 @@ int main(void)
 
 
     if (ich == 
-# 57 "decomment.c" 3 4
+# 62 "decomment.c" 3 4
               (-1)
-# 57 "decomment.c"
+# 62 "decomment.c"
                  ) return func_END(line_com);
 
     ch = (char)ich;
@@ -839,9 +844,9 @@ int main(void)
   }
 
   return(
-# 95 "decomment.c" 3 4
+# 100 "decomment.c" 3 4
         0
-# 95 "decomment.c"
+# 100 "decomment.c"
                     );
 }
 
@@ -849,9 +854,9 @@ int main(void)
 void func_Code(char ch)
 {
    if (ch != '/') fprintf(
-# 101 "decomment.c" 3 4
+# 106 "decomment.c" 3 4
                          stdout
-# 101 "decomment.c"
+# 106 "decomment.c"
                                ,"%c", ch);
 
  if (ch == '/') state = Poss_comm;
@@ -866,31 +871,31 @@ void func_Poss_comm(char ch, int line_cur, int *line_com)
  if (ch == '/'){
   *line_com = line_cur;
   fprintf(
-# 114 "decomment.c" 3 4
+# 119 "decomment.c" 3 4
          stdout
-# 114 "decomment.c"
+# 119 "decomment.c"
                , "%c", ' ');
   state = Single_comm;
  }
  else if (ch == '*'){
   *line_com = line_cur;
   fprintf(
-# 119 "decomment.c" 3 4
+# 124 "decomment.c" 3 4
          stdout
-# 119 "decomment.c"
+# 124 "decomment.c"
                , "%c", ' ');
   state = Multi_comm;
  }
  else {
   fprintf(
-# 123 "decomment.c" 3 4
+# 128 "decomment.c" 3 4
          stdout
-# 123 "decomment.c"
+# 128 "decomment.c"
                , "%c", '/');
   fprintf(
-# 124 "decomment.c" 3 4
+# 129 "decomment.c" 3 4
          stdout
-# 124 "decomment.c"
+# 129 "decomment.c"
                , "%c", ch);
   state = Code;
  }
@@ -901,9 +906,9 @@ void func_Single_comm(char ch)
 {
  if (ch == '\n'){
   fprintf(
-# 133 "decomment.c" 3 4
+# 138 "decomment.c" 3 4
          stdout
-# 133 "decomment.c"
+# 138 "decomment.c"
                , "%c", '\n');
   state = Code;
  }
@@ -913,9 +918,9 @@ void func_Single_comm(char ch)
 void func_Multi_comm(char ch, char ch_before)
 {
  if (ch == '\n') fprintf(
-# 141 "decomment.c" 3 4
+# 146 "decomment.c" 3 4
                         stdout
-# 141 "decomment.c"
+# 146 "decomment.c"
                               , "%c", '\n');
  if (ch_before == '*' && ch == '/') state = Code;
 }
@@ -924,9 +929,9 @@ void func_Multi_comm(char ch, char ch_before)
 void func_In_string(char ch)
 {
  fprintf(
-# 148 "decomment.c" 3 4
+# 153 "decomment.c" 3 4
         stdout
-# 148 "decomment.c"
+# 153 "decomment.c"
               , "%c", ch);
  if (ch == '\"') state = Code;
 }
@@ -935,9 +940,9 @@ void func_In_string(char ch)
 void func_In_char(char ch)
 {
  fprintf(
-# 155 "decomment.c" 3 4
+# 160 "decomment.c" 3 4
         stdout
-# 155 "decomment.c"
+# 160 "decomment.c"
               , "%c", ch);
  if (ch == '\'') state = Code;
 }
@@ -947,20 +952,20 @@ int func_END(int line_com)
 {
  if (state == Single_comm || state == Multi_comm){
   fprintf(
-# 163 "decomment.c" 3 4
+# 168 "decomment.c" 3 4
          stderr
-# 163 "decomment.c"
+# 168 "decomment.c"
                , "Error: line %d: unterminated comment\n", line_com);
   return (
-# 164 "decomment.c" 3 4
+# 169 "decomment.c" 3 4
          1
-# 164 "decomment.c"
+# 169 "decomment.c"
                      );
  }
  else
   return (
-# 167 "decomment.c" 3 4
+# 172 "decomment.c" 3 4
          0
-# 167 "decomment.c"
+# 172 "decomment.c"
                      );
 }

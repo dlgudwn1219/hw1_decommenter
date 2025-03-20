@@ -1,3 +1,8 @@
+/*
+1. Name: 이형주 (Lee HyungJu)
+2. # of Assignment: 1
+3. Name of file: decomment.c
+*/
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
